@@ -59,8 +59,9 @@ def create_app():
 
     return app
 
+# --- THE FIX: Initialize the app here so Gunicorn can see it! ---
+app = create_app()
 
 if __name__ == '__main__':
-    app = create_app()
     print("🎵 MoodMatch is running at http://localhost:5000")
     app.run(debug=True, host='0.0.0.0', port=5000)
