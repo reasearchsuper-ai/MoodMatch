@@ -1,10 +1,10 @@
 """
 MoodMatch - AI-Powered Emotion-to-Music App
-Entry point for the Flask application
+Final Production-Ready Configuration
 """
 
 import os
-from flask import Flask
+from flask import Flask, render_template
 from flask_cors import CORS
 from backend.routes.upload import upload_bp
 from backend.routes.emotion import emotion_bp
@@ -13,16 +13,21 @@ from backend.routes.analytics import analytics_bp
 from backend.routes.history import history_bp
 
 def create_app():
+    # Get the directory where app.py is located to ensure paths are always correct
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    template_dir = os.path.join(base_dir, 'frontend', 'templates')
+    static_dir = os.path.join(base_dir, 'frontend', 'static')
+
     app = Flask(
         __name__,
-        template_folder="frontend/templates",
-        static_folder="frontend/static"
+        template_folder=template_dir,
+        static_folder=static_dir
     )
 
     # Configuration
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'moodmatch-secret-2024')
     app.config['UPLOAD_FOLDER'] = os.path.join(os.getcwd(), 'uploads')
-    app.config['MAX_CONTENT_LENGTH'] = 200 * 1024 * 1024  # 200MB max upload
+    app.config['MAX_CONTENT_LENGTH'] = 200 * 1024 * 1024  # 200MB max
     app.config['ALLOWED_EXTENSIONS'] = {'mp4', 'avi', 'mov', 'mkv', 'webm', 'flv'}
     app.config['DATABASE'] = os.path.join(os.getcwd(), 'moodmatch.db')
 
@@ -39,8 +44,7 @@ def create_app():
     app.register_blueprint(analytics_bp, url_prefix='/api')
     app.register_blueprint(history_bp, url_prefix='/api')
 
-    # Main frontend route
-    from flask import render_template
+    # Main frontend routes
     @app.route('/')
     def index():
         return render_template('index.html')
@@ -59,7 +63,7 @@ def create_app():
 
     return app
 
-# --- THE FIX: Initialize the app here so Gunicorn can see it! ---
+# Gunicorn looks for this 'app' variable
 app = create_app()
 
 if __name__ == '__main__':
